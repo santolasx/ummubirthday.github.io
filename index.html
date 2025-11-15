@@ -1,0 +1,393 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Ümmü 🎀</title>
+<style>
+  /* --- Pembe tema, mobil-first --- */
+  :root{
+    --bg1:#fff0f6;
+    --bg2:#ffe6f0;
+    --card:#ffffff;
+    --accent:#ff5da2;
+    --accent-2:#ff99c8;
+    --muted:#7a5266;
+    --glass: rgba(255,255,255,0.6);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial; background:linear-gradient(180deg,var(--bg1),var(--bg2)); color:#331a2b}
+  .wrap{max-width:920px;margin:18px auto;padding:12px}
+  header{display:flex;align-items:center;gap:12px;justify-content:space-between}
+  .logo{display:flex;gap:10px;align-items:center}
+  .logo .badge{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:white;padding:8px 12px;border-radius:999px;font-weight:700;box-shadow:0 6px 16px rgba(255,93,162,0.18)}
+  h1{margin:0;font-size:20px}
+  .sub{color:var(--muted);font-size:13px}
+
+  /* Card */
+  .card{background:var(--card);border-radius:14px;padding:14px;margin-top:12px;box-shadow:0 10px 30px rgba(51,26,43,0.06);position:relative}
+  .top-row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+  .cover{flex:1;min-width:160px;border-radius:12px;overflow:hidden;position:relative;background:linear-gradient(135deg,var(--accent-2),#ffd7ea);padding:12px}
+  .cover h2{margin:0;color:white;text-shadow:0 3px 10px rgba(0,0,0,0.12)}
+  .cover p{margin:6px 0 0;color:rgba(255,255,255,0.95);font-weight:600}
+
+  /* controls */
+  .controls{display:flex;gap:8px;align-items:center}
+  .btn{background:var(--accent);color:white;border:none;padding:10px 12px;border-radius:10px;font-weight:700}
+  .muted-btn{background:var(--accent-2);color:#4a0022;border:none;padding:8px 10px;border-radius:10px}
+
+  /* gallery */
+  .gallery{display:flex;gap:8px;overflow-x:auto;padding:12px 0}
+  .gallery img{width:120px;height:120px;object-fit:cover;border-radius:10px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+  .uploader{display:flex;gap:8px;align-items:center}
+
+  /* guestbook */
+  .guest{margin-top:12px}
+  .form-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+  input[type="text"],textarea{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(122,82,102,0.12);background:var(--glass);min-width:120px}
+  textarea{min-height:84px;resize:vertical}
+  .entry{background:linear-gradient(180deg,#fff,#fff8fb);padding:10px;border-radius:12px;margin-top:8px;box-shadow:0 6px 18px rgba(122,82,102,0.04)}
+  .entry .meta{font-size:12px;color:var(--muted);margin-bottom:6px}
+
+  /* hearts (falling) field */
+  #hearts{position:fixed;left:0;top:0;right:0;bottom:0;pointer-events:none;z-index:50}
+
+  /* responsive */
+  @media(min-width:800px){
+    .top-row{align-items:stretch}
+    .cover{flex:0 0 320px}
+  }
+
+  /* small utilities */
+  .small{font-size:13px;color:var(--muted)}
+  .center{text-align:center}
+  .confetti {position:fixed;left:0;right:0;top:0;pointer-events:none;z-index:60}
+</style>
+</head>
+<body>
+<div id="hearts"></div>
+<div class="wrap">
+  <header>
+    <div class="logo">
+      <div class="badge">Ümmü 🎀</div>
+      <div>
+        <h1>Ümmü'ye Özel</h1>
+        <div class="sub">18 Kasım — Tüm mesajlar ümmüye bir moral verir.</div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center">
+      <button id="playBtn" class="btn">BURAYA TIKLA</button>
+      <label style="display:flex;align-items:center;gap:8px">
+        <input id="heartToggle" type="checkbox" checked> Kalp yağsın
+      </label>
+    </div>
+  </header>
+
+  <main class="card" id="mainCard">
+    <div class="top-row">
+      <section class="cover">
+        <h2>Mutlu Yıllar Ümmü!</h2>
+        <p>Bugün senin günü — tatlı ve özel.</p>
+        <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn" id="wishesBtn">Hemen Mesaj Gönder</button>
+          <button class="muted-btn" id="themeBtn">ümmü gümgüm</button>
+        </div>
+        <p class="small" style="margin-top:8px">İYİ Kİ DOĞDUN ÛMMÛ</p>
+      </section>
+
+      <section style="flex:1;min-width:220px">
+        <div class="gallery" id="gallery">
+          <!-- default placeholder images (user can upload) -->
+          <img src="girl.jpg" alt="foto" onerror="this.style.opacity=.35; this.title='Yer tutucu: girl.jpg yok'">
+        </div>
+
+    <section class="guest">
+      <h3 style="margin:0">🎁 Mesaj Defteri / Guestbook</h3>
+      <div class="form-row">
+        <input id="nameInp" type="text" placeholder="Adın (örn. Ahmet)">
+        <input id="titleInp" type="text" placeholder="Kısa başlık (örn. Canım Ümmü)">
+      </div>
+      <div style="margin-top:8px" class="form-row">
+        <textarea id="msgInp" placeholder="Mesajını yaz... (en az 8 karakter)"></textarea>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px;align-items:center">
+        <button class="btn" id="sendBtn">Gönder & Confetti 🎉</button>
+        <button class="muted-btn" id="clearAll">(ümmü mantı sever)</div>
+      </div>
+
+      <div id="entries" style="margin-top:12px">
+        <!-- guestbook entries gösterilecek -->
+      </div>
+    </section>
+
+    <section style="margin-top:12px" class="center">
+      <p class="small">İyi Ki Doğdun ümmü</p>
+    </section>
+  </main>
+
+  <footer style="text-align:center;margin-top:12px" class="small">
+    <div>Nice Mutlu Senelere by santolas team.</div>
+  </footer>
+</div>
+
+<!-- audio (opsiyonel music.mp3) -->
+<audio id="bgm" loop>
+  <source src="music.mp3" type="audio/mpeg">
+  Tarayıcınız audio desteklemiyor.
+</audio>
+
+<!-- Confetti canvas -->
+<canvas id="confetti" class="confetti" width="1" height="1" style="display:none"></canvas>
+
+<script>
+/* ---------- Utilities ---------- */
+const bgm = document.getElementById('bgm');
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', async () => {
+  try {
+    if (bgm.paused) {
+      await bgm.play();
+      playBtn.textContent = 'susss';
+    } else {
+      bgm.pause();
+      playBtn.textContent = 'Aferin';
+    }
+  } catch(e) {
+    alert('Annem dediki ümmünün sevdiği obje kulaklıkmış.');
+  }
+});
+
+/* ---------- Hearts (falling) ---------- */
+const heartsField = document.getElementById('hearts');
+const heartToggle = document.getElementById('heartToggle');
+let heartInterval = null;
+
+function makeHeart(){
+  if (!heartToggle.checked) return;
+  const h = document.createElement('div');
+  h.textContent = '💗';
+  h.style.position = 'fixed';
+  const size = 12 + Math.random()*36;
+  h.style.fontSize = size + 'px';
+  h.style.left = (Math.random()*90 + 5) + 'vw';
+  h.style.top = '-5vh';
+  h.style.opacity = (0.6 + Math.random()*0.4);
+  h.style.transform = 'rotate(' + (Math.random()*60 - 30) + 'deg)';
+  h.style.pointerEvents = 'none';
+  heartsField.appendChild(h);
+
+  const duration = 4000 + Math.random()*5000;
+  h.animate([
+    { transform: `translateY(0)`, opacity: h.style.opacity },
+    { transform: `translateY(110vh) rotate(${Math.random()*360}deg)`, opacity: 0.9 }
+  ], { duration: duration, easing: 'linear'});
+
+  setTimeout(()=> h.remove(), duration+60);
+}
+heartInterval = setInterval(makeHeart, 450);
+heartToggle.addEventListener('change', () => {
+  if (!heartToggle.checked) {
+    // remove existing hearts gradually
+    clearInterval(heartInterval);
+  } else {
+    heartInterval = setInterval(makeHeart, 450);
+  }
+});
+
+/* ---------- Gallery: file input preview and append ---------- */
+const fileInput = document.getElementById('fileInput');
+const addLocal = document.getElementById('addLocal');
+const gallery = document.getElementById('gallery');
+
+addLocal.addEventListener('click', () => {
+  const files = fileInput.files;
+  if (!files || files.length === 0) return alert('Resim seçin (bir veya birkaç).');
+  Array.from(files).forEach(f => {
+    if (!f.type.startsWith('image/')) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.alt = 'uploaded';
+      img.style.cursor = 'pointer';
+      img.addEventListener('click', ()=> openLightbox(img.src));
+      gallery.appendChild(img);
+    };
+    reader.readAsDataURL(f);
+  });
+  fileInput.value = '';
+});
+
+/* ---------- Lightbox (basit) ---------- */
+function openLightbox(src){
+  const overlay = document.createElement('div');
+  overlay.style.position='fixed';
+  overlay.style.left=0;overlay.style.top=0;overlay.style.right=0;overlay.style.bottom=0;
+  overlay.style.background='rgba(0,0,0,0.6)';
+  overlay.style.display='flex';overlay.style.alignItems='center';overlay.style.justifyContent='center';
+  overlay.style.zIndex=9999;
+  const img = document.createElement('img');
+  img.src = src; img.style.maxWidth='92%'; img.style.maxHeight='92%'; img.style.borderRadius='12px';
+  overlay.appendChild(img);
+  overlay.addEventListener('click', ()=> overlay.remove());
+  document.body.appendChild(overlay);
+}
+
+/* ---------- Guestbook (localStorage) ---------- */
+const nameInp = document.getElementById('nameInp');
+const titleInp = document.getElementById('titleInp');
+const msgInp = document.getElementById('msgInp');
+const sendBtn = document.getElementById('sendBtn');
+const entriesDiv = document.getElementById('entries');
+const clearAll = document.getElementById('clearAll');
+
+function loadEntries(){
+  const raw = localStorage.getItem('ummu_guest') || '[]';
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return [];
+  }
+}
+function saveEntries(list){
+  localStorage.setItem('ummu_guest', JSON.stringify(list));
+}
+function renderEntries(){
+  const list = loadEntries();
+  entriesDiv.innerHTML = '';
+  if(!list.length){
+    entriesDiv.innerHTML = '<div class="small">Henüz mesaj yok. İlk sen ol!</div>';
+    return;
+  }
+  list.slice().reverse().forEach(e=>{
+    const el = document.createElement('div');
+    el.className = 'entry';
+    const meta = document.createElement('div');
+    meta.className = 'meta';
+    meta.textContent = `${escapeHtml(e.name || 'Anonim')} • ${new Date(e.time).toLocaleString()} ${e.title ? '• ' + escapeHtml(e.title) : ''}`;
+    const text = document.createElement('div');
+    text.innerHTML = escapeHtml(e.msg).replace(/\n/g,'<br>');
+    el.appendChild(meta);
+    el.appendChild(text);
+    entriesDiv.appendChild(el);
+  });
+}
+
+function escapeHtml(s){
+  if(!s) return '';
+  return s.replaceAll('&','&amp;').replaceAll('<','&lt;').replaceAll('>','&gt;').replaceAll('"','&quot;');
+}
+
+sendBtn.addEventListener('click', ()=>{
+  const name = nameInp.value.trim() || 'Anonim';
+  const title = titleInp.value.trim();
+  const msg = msgInp.value.trim();
+  if(msg.length < 8) { alert('Mesaj en az 8 karakter olmalı.'); return; }
+  const list = loadEntries();
+  list.push({name, title, msg, time: Date.now()});
+  saveEntries(list);
+  nameInp.value=''; titleInp.value=''; msgInp.value='';
+  renderEntries();
+  // celebration
+  launchConfetti();
+  // brief heart burst
+  for(let i=0;i<20;i++) setTimeout(makeHeart, i*60);
+});
+
+clearAll.addEventListener('click', ()=>{
+  if(!confirm('Tüm mesajları silmek istediğine emin misin?')) return;
+  localStorage.removeItem('ummu_guest');
+  renderEntries();
+});
+
+/* ---------- Confetti (simple canvas) ---------- */
+const confettiCanvas = document.getElementById('confetti');
+const confettiCtx = confettiCanvas.getContext && confettiCanvas.getContext('2d');
+
+function resizeConfetti(){
+  confettiCanvas.width = window.innerWidth;
+  confettiCanvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resizeConfetti);
+resizeConfetti();
+
+function launchConfetti(){
+  if(!confettiCtx) return;
+  confettiCanvas.style.display='block';
+  const pieces = [];
+  const colors = ['#ff6b6b','#ff9ac2','#ffd6e8','#ffb3da','#ff87b9'];
+  for(let i=0;i<120;i++){
+    pieces.push({
+      x: Math.random()*confettiCanvas.width,
+      y: -Math.random()*confettiCanvas.height,
+      vx: (Math.random()-0.5)*6,
+      vy: 2 + Math.random()*6,
+      r: 6 + Math.random()*8,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      rot: Math.random()*360,
+      dr: (Math.random()-0.5)*6
+    });
+  }
+  let t0 = performance.now();
+  function frame(t){
+    const dt = t - t0; t0 = t;
+    confettiCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height);
+    pieces.forEach(p=>{
+      p.x += p.vx; p.y += p.vy;
+      p.vy += 0.05;
+      p.rot += p.dr;
+      confettiCtx.save();
+      confettiCtx.translate(p.x,p.y);
+      confettiCtx.rotate(p.rot*Math.PI/180);
+      confettiCtx.fillStyle = p.color;
+      confettiCtx.fillRect(-p.r/2, -p.r/2, p.r, p.r*1.6);
+      confettiCtx.restore();
+    });
+    // remove pieces off screen
+    for(let i=pieces.length-1;i>=0;i--) if(pieces[i].y > confettiCanvas.height + 40) pieces.splice(i,1);
+    if(pieces.length) requestAnimationFrame(frame);
+    else setTimeout(()=>{ confettiCanvas.style.display='none'; confettiCtx.clearRect(0,0,confettiCanvas.width, confettiCanvas.height); }, 400);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- Theme switch (farklı pembe tonları) ---------- */
+const themeBtn = document.getElementById('themeBtn');
+let themeIndex = 0;
+const themes = [
+  {bg1:'#fff0f6',bg2:'#ffe6f0',accent:'#ff5da2',accent2:'#ff99c8'},
+  {bg1:'#fff7f9',bg2:'#fff0f6',accent:'#ff4c9e',accent2:'#ff9ccf'},
+  {bg1:'#fff9fb',bg2:'#fff3f7',accent:'#ff6ba8',accent2:'#ffc0db'}
+];
+themeBtn.addEventListener('click', ()=>{
+  themeIndex = (themeIndex + 1) % themes.length;
+  const t = themes[themeIndex];
+  document.documentElement.style.setProperty('--bg1', t.bg1);
+  document.documentElement.style.setProperty('--bg2', t.bg2);
+  document.documentElement.style.setProperty('--accent', t.accent);
+  document.documentElement.style.setProperty('--accent-2', t.accent2);
+});
+
+/* ---------- Init ---------- */
+renderEntries();
+
+/* Make gallery images clickable to enlarge */
+document.querySelectorAll('#gallery img').forEach(img => {
+  img.addEventListener('click', ()=> openLightbox(img.src));
+});
+/* Scroll to form if wishesBtn clicked */
+document.getElementById('wishesBtn').addEventListener('click', ()=> {
+  msgInp.focus();
+  window.scrollTo({top: document.getElementById('mainCard').offsetTop + 200, behavior:'smooth'});
+});
+
+/* small helper: allow enter+ctrl to submit message */
+msgInp.addEventListener('keydown', (e)=>{
+  if(e.key === 'Enter' && (e.ctrlKey || e.metaKey)){
+    sendBtn.click();
+  }
+});
+</script>
+</body>
+</html>
